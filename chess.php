@@ -27,3 +27,4 @@ switch ($r=array_shift($request)) {
 	header("HTTP/1.1 404 Not Found");
 	exit;
 }
+?>

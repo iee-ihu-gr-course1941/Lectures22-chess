@@ -1,6 +1,7 @@
 $( function() {
     draw_empty_board();
     fill_board();
+    $('#chess_reset').click(reset_board);
 }
 );
 
@@ -26,7 +27,14 @@ function fill_board() {
 		}
 		);
 }
-
+function reset_board() {
+	$.ajax(
+		{url: "chess.php/board/", 
+         method: 'post',
+		 success: fill_board_by_data 
+		}
+		);
+}
 function fill_board_by_data(data) {
 	for(var i=0;i<data.length;i++) {
 		var o = data[i];

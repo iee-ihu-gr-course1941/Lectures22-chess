@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Διακομιστής:                  127.0.0.1
--- Έκδοση διακομιστή:            10.4.25-MariaDB - mariadb.org binary distribution
--- Λειτ. σύστημα διακομιστή:     Win64
--- HeidiSQL Έκδοση:              12.1.0.6537
+-- Host:                         127.0.0.1
+-- Server version:               10.4.25-MariaDB - mariadb.org binary distribution
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.2.0.6576
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -14,7 +14,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for πίνακας chess.board
+-- Dumping structure for table chess.board
+DROP TABLE IF EXISTS `board`;
 CREATE TABLE IF NOT EXISTS `board` (
   `x` tinyint(1) NOT NULL,
   `y` tinyint(1) NOT NULL,
@@ -38,13 +39,13 @@ INSERT INTO `board` (`x`, `y`, `b_color`, `piece_color`, `piece`) VALUES
 	(2, 2, 'B', 'W', 'P'),
 	(3, 2, 'W', 'W', 'P'),
 	(4, 2, 'B', 'W', 'P'),
-	(5, 2, 'W', NULL, NULL),
+	(5, 2, 'W', 'W', 'P'),
 	(6, 2, 'B', 'W', 'P'),
 	(7, 2, 'W', 'W', 'P'),
-	(8, 2, 'B', NULL, NULL),
+	(8, 2, 'B', 'W', 'P'),
 	(1, 3, 'B', NULL, NULL),
 	(2, 3, 'W', NULL, NULL),
-	(3, 3, 'B', 'W', 'P'),
+	(3, 3, 'B', NULL, NULL),
 	(4, 3, 'W', NULL, NULL),
 	(5, 3, 'B', NULL, NULL),
 	(6, 3, 'W', NULL, NULL),
@@ -74,7 +75,7 @@ INSERT INTO `board` (`x`, `y`, `b_color`, `piece_color`, `piece`) VALUES
 	(6, 6, 'B', NULL, NULL),
 	(7, 6, 'W', NULL, NULL),
 	(8, 6, 'B', NULL, NULL),
-	(1, 7, 'B', 'W', 'P'),
+	(1, 7, 'B', 'B', 'P'),
 	(2, 7, 'W', 'B', 'P'),
 	(3, 7, 'B', 'B', 'P'),
 	(4, 7, 'W', 'B', 'P'),
@@ -91,7 +92,8 @@ INSERT INTO `board` (`x`, `y`, `b_color`, `piece_color`, `piece`) VALUES
 	(7, 8, 'W', 'B', 'N'),
 	(8, 8, 'B', 'B', 'R');
 
--- Dumping structure for πίνακας chess.board_empty
+-- Dumping structure for table chess.board_empty
+DROP TABLE IF EXISTS `board_empty`;
 CREATE TABLE IF NOT EXISTS `board_empty` (
   `x` tinyint(1) NOT NULL,
   `y` tinyint(1) NOT NULL,
@@ -169,6 +171,7 @@ INSERT INTO `board_empty` (`x`, `y`, `b_color`, `piece_color`, `piece`) VALUES
 	(8, 8, 'B', 'B', 'R');
 
 -- Dumping structure for procedure chess.clean_board
+DROP PROCEDURE IF EXISTS `clean_board`;
 DELIMITER //
 CREATE PROCEDURE `clean_board`()
 BEGIN
@@ -176,7 +179,8 @@ BEGIN
 END//
 DELIMITER ;
 
--- Dumping structure for πίνακας chess.game_status
+-- Dumping structure for table chess.game_status
+DROP TABLE IF EXISTS `game_status`;
 CREATE TABLE IF NOT EXISTS `game_status` (
   `status` enum('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
   `p_turn` enum('W','B') DEFAULT NULL,
@@ -184,11 +188,12 @@ CREATE TABLE IF NOT EXISTS `game_status` (
   `last_change` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table chess.game_status: ~1 rows (approximately)
+-- Dumping data for table chess.game_status: ~0 rows (approximately)
 INSERT INTO `game_status` (`status`, `p_turn`, `result`, `last_change`) VALUES
-	('not active', 'B', 'D', '2022-11-08 18:57:40');
+	('started', 'W', 'D', '2022-11-28 18:39:59');
 
 -- Dumping structure for procedure chess.move_piece
+DROP PROCEDURE IF EXISTS `move_piece`;
 DELIMITER //
 CREATE PROCEDURE `move_piece`(x1 tinyint,y1 tinyint,x2 tinyint,y2 tinyint)
 BEGIN
@@ -208,19 +213,20 @@ BEGIN
     END//
 DELIMITER ;
 
--- Dumping structure for πίνακας chess.players
+-- Dumping structure for table chess.players
+DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `username` varchar(20) DEFAULT NULL,
   `piece_color` enum('B','W') NOT NULL,
   `token` varchar(100) DEFAULT NULL,
-  `last_action` timestamp NULL DEFAULT NULL,
+  `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`piece_color`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table chess.players: ~2 rows (approximately)
 INSERT INTO `players` (`username`, `piece_color`, `token`, `last_action`) VALUES
-	(NULL, 'B', NULL, NULL),
-	(NULL, 'W', NULL, NULL);
+	('qqqqqq', 'B', '8599a2efe05697622caeddae84507ee3', '2022-11-28 18:16:51'),
+	('aaaa', 'W', '05da4297eecc648e840b6d3bfa772adc', '2022-11-28 17:16:54');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

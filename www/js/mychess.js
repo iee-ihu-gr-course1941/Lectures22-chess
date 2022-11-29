@@ -8,8 +8,32 @@ $( function() {
     fill_board();
     $('#chess_reset').click(reset_board);
 	$('#chess_login').click( login_to_game);
+	$('#move_div').hide(1000);
+	$('#do_move').click( do_move);
 }
 );
+
+function do_move() {
+	var s = $('#the_move').val();
+	
+	var a = s.trim().split(/[ ]+/);
+	if(a.length!=4) {
+		alert('Must give 4 numbers');
+		return;
+	}
+	$.ajax({url: "chess.php/board/piece/"+a[0]+'/'+a[1], 
+			method: 'PUT',
+			dataType: "json",
+			contentType: 'application/json',
+			data: JSON.stringify( {x: a[2], y: a[3], token: me.token}),
+			success: move_result,
+			error: login_error});
+	
+}
+
+function move_result(data){
+	fill_board_by_data(data);
+}
 
 
 function draw_empty_board(p) {
@@ -101,7 +125,7 @@ function game_status_update() {
 function update_status(data) {
 	game_status=data[0];
 	update_info();
-	/* if(game_status.p_turn==me.piece_color &&  me.piece_color!=null) {
+	 if(game_status.p_turn==me.piece_color &&  me.piece_color!=null) {
 		x=0;
 		// do play
 		$('#move_div').show(1000);
@@ -110,6 +134,6 @@ function update_status(data) {
 		// must wait for something
 		$('#move_div').hide(1000);
 		setTimeout(function() { game_status_update();}, 4000);
-	} */
+	} 
  	
 }

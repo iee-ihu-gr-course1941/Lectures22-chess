@@ -1,8 +1,8 @@
 <?php
 
 function show_status() {
-    global $mysqli;
 	
+	global $mysqli;
 	$sql = 'select * from game_status';
 	$st = $mysqli->prepare($sql);
 
@@ -11,25 +11,17 @@ function show_status() {
 
 	header('Content-type: application/json');
 	print json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
+
 }
 
-function read_status() {
-	global $mysqli;
-	
-	$sql = 'select * from game_status';
-	$st = $mysqli->prepare($sql);
 
-	$st->execute();
-	$res = $st->get_result();
-	$status = $res->fetch_assoc();
-	return($status);
-}
 
 function update_game_status() {
 	global $mysqli;
 	
 	$sql = 'select * from game_status';
 	$st = $mysqli->prepare($sql);
+
 	$st->execute();
 	$res = $st->get_result();
 	$status = $res->fetch_assoc();
@@ -75,5 +67,18 @@ function update_game_status() {
 	$st->execute();
 	
 	
+	
+}
+
+function read_status() {
+	global $mysqli;
+	
+	$sql = 'select * from game_status';
+	$st = $mysqli->prepare($sql);
+
+	$st->execute();
+	$res = $st->get_result();
+	$status = $res->fetch_assoc();
+	return($status);
 }
 ?>

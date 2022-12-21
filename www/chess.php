@@ -6,6 +6,7 @@ require_once "../lib/users.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
+$request_path = trim($_SERVER['PATH_INFO'],'/');
 $input = json_decode(file_get_contents('php://input'),true);
 if($input==null) {
     $input=[];
@@ -15,81 +16,31 @@ if(isset($_SERVER['HTTP_X_TOKEN'])) {
 } else {
     $input['token']='';
 }
-
-
-// header("Content-Type: text/plain");
-// print "method=$method\n";
-// print "Path_info=".$_SERVER['PATH_INFO']."\n";
-// print_r($request);
-
-
-switch ($r=array_shift($request)) {
-    case 'board' : 
-        switch ($b=array_shift($request)) {
-            case '':
-            case null: handle_board($method,$input);
-                        break;
-            case 'piece': handle_piece($method, $request[0],$request[1],$input);
-                        break;
-	    default: header("HTTP/1.1 404 Not Found");
-                            break;
-			}
-            break;
-    case 'status': 
-			if(sizeof($request)==0) {handle_status($method);}
-			else {header("HTTP/1.1 404 Not Found");}
-			break;
-	case 'players': handle_player($method, $request,$input);
-			    break;
-	default:  header("HTTP/1.1 404 Not Found");
-                        exit;
+//
+// Έχουμε αλλάξει την δομή του chess.php σε περισσότερο compact ώστε να θυμίζει καλύτερα τον σχεδιασμό του API.
+// Το παλιό αρχείο είναι το chess-orig.php
+//
+if (preg_match('/^board$/', $request_path, $matches) ) {
+    if($method=='GET') { show_board($input);}
+    elseif($method=='POST') { reset_board();  show_board($input);}
+    else { header('HTTP/1.1 405 Method Not Allowed');}
+} else if (preg_match('/^board\/piece\/([0-9])\/([0-9])$/', $request_path, $matches )) {
+    if($method=='GET') { show_piece($matches[1],$matches[2]); }
+    elseif($method=='PUT') {move_piece($matches[1],$matches[2],$input['x'],$input['y'], $input['token']); }    
+    else {header('HTTP/1.1 405 Method Not Allowed');}
+} else if (preg_match('/^status$/', $request_path, $matches )) {
+    if($method=='GET') {show_status();}
+    else {header('HTTP/1.1 405 Method Not Allowed');}
+} else if (preg_match('/^players\/([BW])$/', $request_path, $matches) ) {
+    if($method=='GET') { show_user($matches[1]);} 
+    elseif($method=='PUT') { set_user($matches[1],$input);}
+    else  {header('HTTP/1.1 405 Method Not Allowed');}
+} else if (preg_match('/^players\/([^BW])$/', $request_path, $matches) ) {
+        header("HTTP/1.1 404 Not Found");
+		print json_encode(['errormesg'=>"Player ($matches[1] not found."]);
+} else {
+    header("HTTP/1.1 404 Not Found");
 }
 
 
-function handle_board($method,$input) {
-    if($method=='GET') {
-            show_board($input);
-    } else if ($method=='POST') {
-            reset_board();
-            show_board($input);
-    } else {
-        header('HTTP/1.1 405 Method Not Allowed');
-    }
-    
-}
-
-    function handle_piece($method, $x,$y,$input) {
-        if($method=='GET') {
-            show_piece($x,$y);
-        } else if ($method=='PUT') {
-            move_piece($x,$y,$input['x'],$input['y'],  
-                       $input['token']);
-        }    
-  
-    
-}
-
-function handle_player($method, $p,$input) {
-    switch ($b=array_shift($p)) {
-	//	case '':
-	//	case null: if($method=='GET') {show_users($method);}
-	//			   else {header("HTTP/1.1 400 Bad Request"); 
-	//					 print json_encode(['errormesg'=>"Method $method not allowed here."]);}
-    //                break;
-        case 'B': 
-		case 'W': handle_user($method, $b,$input);
-					break;
-		default: header("HTTP/1.1 404 Not Found");
-				 print json_encode(['errormesg'=>"Player $b not found."]);
-                 break;
-	}
-}
-
-function handle_status($method) {
-    if($method=='GET') {
-        show_status();
-    } else {
-        header('HTTP/1.1 405 Method Not Allowed');
-    }
-}
 ?>
